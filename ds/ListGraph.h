@@ -8,6 +8,7 @@
 #include <list>
 #include <vector>
 #include <iostream>
+#include <queue>
 #include "Edge.h"
 
 template<typename T>
@@ -19,7 +20,7 @@ class ListGraph {
 public:
     bool adjacent(T &v1, T &v2);
 
-    std::vector<T> neighbours(T &v);
+    std::list<T*> neighbours(T &v);
 
     void addVertex(T &v);
 
@@ -30,6 +31,8 @@ public:
     void removeEdge(Edge<T> e);
 
     std::vector<Edge<T>> depthFirstSearch(T &startVertex);
+
+    std::vector<Edge<T>> breathFirstSearch(T& startVertex);
 
     void dumpGraph();
 };
@@ -46,10 +49,10 @@ bool ListGraph<T>::adjacent(T &v1, T &v2) {
 }
 
 template<typename T>
-std::vector<T> ListGraph<T>::neighbours(T &v) {
+std::list<T*> ListGraph<T>::neighbours(T &v) {
     int vIndex = std::find(vertices.begin(), vertices.end(), &v) - vertices.begin();
 
-    std::vector<T *> neighbours;
+    std::list<T *> neighbours{};
 
     for (auto &edge: edges[vIndex]) {
         neighbours.push_back(edge);
@@ -133,6 +136,30 @@ void ListGraph<T>::dumpGraph() {
         std::cout << "\n";
     }
 
+}
+
+template<typename T>
+std::vector<Edge<T>> ListGraph<T>::breathFirstSearch(T &startVertex) {
+    std::queue<T *> queue;
+    std::vector<T *> visited = {};
+    std::vector<Edge<T>> edgeVector;
+
+    queue.push(&startVertex);
+
+    while (!queue.empty()) {
+        auto curr = queue.front();
+        auto neighbourNode = neighbours(*curr);
+        queue.pop();
+        visited.push_back(curr);
+        for (auto& n: neighbourNode) {
+            if (std::find(visited.begin(), visited.end(), n) == visited.end()) {
+                queue.push(n);
+                edgeVector.emplace_back(*curr, *n);
+            }
+        }
+    }
+
+    return edgeVector;
 }
 
 

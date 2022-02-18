@@ -9,11 +9,14 @@
 #include <cstdint>
 #include <vector>
 #include <iostream>
+#include <queue>
+#include <algorithm>
+#include <list>
 #include "Edge.h"
 
-template<typename T, int verticesCount>
+template<typename T, int maxVertices>
 class AdiacencyGraph {
-    std::array<std::array<bool, verticesCount>, verticesCount> matrix{};
+    std::array<std::array<bool, maxVertices>, maxVertices> matrix{};
     std::vector<T *> vertices;
     uint32_t size = 0;
 
@@ -22,7 +25,7 @@ class AdiacencyGraph {
 public:
     bool adjacent(T &v1, T &v2);
 
-    std::vector<T> neighbours(T &v);
+    std::list<T *> neighbours(T &v);
 
     void addVertex(T &v);
 
@@ -33,6 +36,8 @@ public:
     void removeEdge(Edge<T> e);
 
     std::vector<Edge<T>> depthFirstSearch(T &startVertex);
+
+    std::vector<Edge<T>> breathFirstSearch(T &startVertex);
 
     void dumpGraph();
 };
@@ -61,27 +66,31 @@ bool AdiacencyGraph<T, verticesCount>::adjacent(T &v1, T &v2) {
 }
 
 template<typename T, int verticesCount>
-std::vector<T> AdiacencyGraph<T, verticesCount>::neighbours(T &v) {
-    std::vector<T> neighbours;
+std::list<T *> AdiacencyGraph<T, verticesCount>::neighbours(T &v) {
+    std::list<T *> neighbours{};
     int v1Index = std::find(vertices.begin(), vertices.end(), &v) - vertices.begin();
     for (int i = 0; i < size; ++i) {
-        if (matrix[v1Index][i]) neighbours.push_back(vertices[i]);
+        if (matrix[v1Index][i]){
+            neighbours.push_back(vertices[i]);
+        }
     }
+    return neighbours;
 }
 
 template<typename T, int verticesCount>
 void AdiacencyGraph<T, verticesCount>::removeVertex(T &v) {
     size--;
     int vIndex = std::find(vertices.begin(), vertices.end(), &v) - vertices.begin();
-    for (auto it = matrix.begin() + vIndex; it != matrix.begin() + size; it++) {
+    for (auto it = matrix.begin() + vIndex; it != matrix.end(); it++) {
         std::iter_swap(it, it + 1);
     }
 
     for (int i = 0; i < verticesCount; ++i) {
-        for (int j = verticesCount; j < size; ++j) {
+        for (int j = size; j < verticesCount; ++j) {
             matrix[i][j] = matrix[i][j + 1];
         }
     }
+
     std::array<bool, verticesCount> falseArray;
     std::fill(falseArray.begin(), falseArray.end(), false);
     std::fill(matrix.begin() + size, matrix.end(), falseArray);
@@ -121,9 +130,10 @@ void AdiacencyGraph<T, verticesCount>::depthFirstSearch(T &startVertex, std::vec
     visited.push_back(&startVertex);
 
     for (int i = 0; i < size; ++i) {
-        if (matrix[vIndex][i] && std::find(visited.begin(), visited.end(), vertices[i]) == visited.end()) {
+        if (matrix[vIndex][i]) {
             edges.emplace_back(startVertex, *vertices[i]);
-            depthFirstSearch(*vertices[i], visited, edges);
+            if (std::find(visited.begin(), visited.end(), vertices[i]) == visited.end())
+                depthFirstSearch(*vertices[i], visited, edges);
         }
     }
 }
@@ -140,6 +150,30 @@ void AdiacencyGraph<T, verticesCount>::dumpGraph() {
     for (const auto &item: vertices) {
         std::cout << *item << " ";
     }
+}
+
+template<typename T, int maxVertices>
+std::vector<Edge<T>> AdiacencyGraph<T, maxVertices>::breathFirstSearch(T &startVertex) {
+    std::queue<T *> queue;
+    std::vector<T *> visited = {&startVertex};
+    std::vector<Edge<T>> edges;
+
+    queue.push(&startVertex);
+
+    while (!queue.empty()) {
+        auto curr = queue.front();
+        auto neighbourNode = neighbours(*curr);
+        queue.pop();
+        visited.push_back(curr);
+        for (auto& n: neighbourNode) {
+            if (std::find(visited.begin(), visited.end(), n) == visited.end()) {
+                queue.push(n);
+                edges.emplace_back(*curr, *n);
+            }
+        }
+    }
+
+    return edges;
 }
 
 
