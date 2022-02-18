@@ -75,7 +75,7 @@ ForwardIt partition(ForwardIt begin, ForwardIt end)
         else
             std::iter_swap(begin++,end--);
     }
-    std::iter_swap(piv,begin);
+    std::iter_swap(piv,end);
     return begin;
 }
 
