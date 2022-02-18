@@ -75,7 +75,7 @@ ForwardIt partition(ForwardIt begin, ForwardIt end)
         else
             std::iter_swap(begin++,end--);
     }
-    std::iter_swap(piv,end);
+    std::iter_swap(piv,begin);
     return begin;
 }
 
@@ -91,6 +91,4 @@ void quickSort(ForwardIt begin, ForwardIt end)
         quickSort(++split,end);
     }
 }
-
-
 #endif //UTILLIB_SORTING_H
