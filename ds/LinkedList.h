@@ -25,8 +25,11 @@ class LinkedList {
     > {
         Node* curr;
 
+        iterator(Node *curr) : curr(curr) {
+        }
+
         iterator& operator++() {
-            curr = curr->next_;
+            curr = curr->next;
             return *this;
         }
 
@@ -121,13 +124,13 @@ void LinkedList<T>::insert(LinkedList::Node *node, T value) {
 }
 
 template<typename T>
-LinkedList::iterator LinkedList<T>::begin() {
-    return LinkedList::iterator();
+typename LinkedList<T>::iterator LinkedList<T>::begin() {
+    return LinkedList::iterator(firstN);
 }
 
 template<typename T>
-LinkedList::iterator LinkedList<T>::end() {
-    return LinkedList::iterator();
+typename LinkedList<T>::iterator LinkedList<T>::end() {
+    return LinkedList::iterator(lastN);
 }
 
 #endif //UTILLIB_LINKEDLIST_H
