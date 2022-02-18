@@ -87,8 +87,8 @@ void quickSort(ForwardIt begin, ForwardIt end)
     {
         ForwardIt split = partition(begin, end);
 
-        quickSort(begin,std::next(split,-1));
-        quickSort(std::next(split,1),end);
+        quickSort(begin,std::prev(split));
+        quickSort(std::next(split),end);
     }
 }
 #endif //UTILLIB_SORTING_H
