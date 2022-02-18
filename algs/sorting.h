@@ -60,41 +60,36 @@ void mergeSort(int arr[], int start, int end) {
 }
 
 template<typename ForwardIt>
-ForwardIt partition(ForwardIt begin, ForwardIt end, int piv) {
-    ForwardIt head = begin;
-    ForwardIt tail = std::prev(end);
+ForwardIt partition(ForwardIt begin, ForwardIt end) 
+{
+    //last element is chosen as pivot
+    ForwardIt piv = end;
+    end--;
 
-    while (head != tail) {
-        while (*head < piv) {
-            if (++head == tail) {
-                return head;
-            }
-        }
-        while (*tail >= piv) {
-            if (--tail == head) {
-                return head;
-            }
-        }
-        std::iter_swap(head, tail);
-        if (++head == tail--) {
-            return head;
-        }
+    while(std::distance(begin,end)<=0)
+    {
+        if(*end<*piv)
+            end--;
+        else if(*begin<*piv)
+            begin++;
+        else
+            std::iter_swap(begin++,end--);
     }
-    return head;
+    std::iter_swap(piv,begin);
+    return begin;
 }
 
 template<typename ForwardIt>
-void quickSort(ForwardIt begin, ForwardIt end) {
+void quickSort(ForwardIt begin, ForwardIt end) 
+{
 
-    if(begin == end) return;
+    if(begin <= end)
+    {
+        ForwardIt split = partition(begin, end);
 
-    auto piv = *(begin);
-
-    ForwardIt split = partition(begin, end, piv);
-
-    quickSort(begin,split);
-    quickSort(++split,end);
-
+        quickSort(begin,split);
+        quickSort(++split,end);
+    }
 }
 
 
