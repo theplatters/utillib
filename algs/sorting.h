@@ -68,7 +68,7 @@ ForwardIt partition(ForwardIt begin, ForwardIt end)
 
     while(std::distance(begin,end)<=0)
     {
-        if(*end<*piv)
+        if(*end>*piv)
             end--;
         else if(*begin<*piv)
             begin++;
@@ -83,7 +83,7 @@ template<typename ForwardIt>
 void quickSort(ForwardIt begin, ForwardIt end) 
 {
 
-    if(std::distance(begin,end)<=0)
+    if(std::distance(begin,end)<0)
     {
         ForwardIt split = partition(begin, end);
 
