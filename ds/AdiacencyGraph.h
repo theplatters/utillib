@@ -37,7 +37,7 @@ public:
 
     std::vector<Edge<T>> depthFirstSearch(T &startVertex);
 
-    std::vector<Edge<T>> breathFirstSearch(T &startVertex);
+    std::vector<Edge<T>> breadthFirstSearch(T &startVertex);
 
     void dumpGraph();
 };
@@ -153,7 +153,7 @@ void AdiacencyGraph<T, verticesCount>::dumpGraph() {
 }
 
 template<typename T, int maxVertices>
-std::vector<Edge<T>> AdiacencyGraph<T, maxVertices>::breathFirstSearch(T &startVertex) {
+std::vector<Edge<T>> AdiacencyGraph<T, maxVertices>::breadthFirstSearch(T &startVertex) {
     std::queue<T *> queue;
     std::vector<T *> visited = {&startVertex};
     std::vector<Edge<T>> edges;
