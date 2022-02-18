@@ -93,8 +93,7 @@ void quickSort(ForwardIt begin, ForwardIt end) {
     ForwardIt split = partition(begin, end, piv);
 
     quickSort(begin,split);
-    ForwardIt mid = begin;
-    quickSort(++mid,end);
+    quickSort(++split,end);
 
 }
 
