@@ -1,13 +1,15 @@
 #include <iostream>
 #include <vector>
-#include "contains.h"
 #include "sorting.h"
+#include "LinkedList.h"
 
 int main() {
 
-    std::vector<int> v = {6,2,1,3,5,8,9,12,98,15,4};
+    LinkedList<int> v;
 
-    quickSort(v.begin(),v.end());
+    v.append(5);
+    v.append(4);
+
 
     for (const auto &item : v){
         std::cout << item << " ";
