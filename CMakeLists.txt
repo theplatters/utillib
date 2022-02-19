@@ -5,4 +5,4 @@ set(CMAKE_CXX_STANDARD 20)
 
 include_directories(algs ds)
 
-add_executable(utillib main.cpp algs/contains.h algs/sorting.h ds/Edge.h ds/AdiacencyGraph.h ds/ListGraph.h ds/DirectedListGraph.h ds/LinkedList.h)
+add_executable(utillib main.cpp algs/contains.h algs/sorting.h ds/Edge.h ds/AdiacencyGraph.h ds/ListGraph.h ds/DirectedListGraph.h ds/LinkedList.h ds/BinaryTree.h)
