@@ -37,7 +37,7 @@ int *mergeSort(int *arr, int *aux, int begin, int end) {
     return merge(arr, aux, begin, mid + 1, end);
 }
 
-int main() {
+void testJakobMerge(){
 
 
     srand(time(0));
@@ -58,9 +58,14 @@ int main() {
     for (int i = 0; i < n; i++)
         std::cout << arr[i] << std::endl;
 
-    delete arr;
-    delete aux;
-    return 0;
+    delete[] arr;
+    delete[] aux;
+
+}
+
+int main() {
+    LinkedList<int> v = {1,2,3,4,5};
+
 
     return 0;
 }

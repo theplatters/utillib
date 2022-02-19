@@ -23,7 +23,7 @@ class LinkedList {
             long,                      // difference_type
             const Node *,               // pointer
             Node                       // reference
-    >{
+    > {
         Node *curr;
 
         explicit iterator(Node *curr) : curr(curr) {
@@ -36,7 +36,7 @@ class LinkedList {
 
 
         iterator &operator++(int) {
-            auto& temp = *this;
+            auto &temp = *this;
             curr = curr->next;
             return temp;
         }
@@ -47,13 +47,13 @@ class LinkedList {
         }
 
         iterator &operator--(int) {
-            auto& temp = *this;
+            auto &temp = *this;
             curr = curr->prev;
             return temp;
         }
 
-        iterator &operator+(int amount){
-            for(int i = 0; i < amount; i++){
+        iterator &operator+(int amount) {
+            for (int i = 0; i < amount; i++) {
                 *this = ++(*this);
             }
             return *this;
@@ -101,11 +101,14 @@ public:
     void printList();
 
     iterator begin();
+
     iterator begin() const;
 
     iterator end();
+
     iterator end() const;
 
+    T operator[](int);
 };
 
 
@@ -152,7 +155,7 @@ T LinkedList<T>::last() {
 
 template<typename T>
 typename LinkedList<T>::iterator LinkedList<T>::begin() {
-    if(firstN->next)
+    if (firstN->next)
         return LinkedList::iterator(firstN->next);
     return LinkedList::iterator(new Node{.prev = firstN});
 }
@@ -163,7 +166,7 @@ typename LinkedList<T>::iterator LinkedList<T>::begin() const {
 }
 
 template<typename T>
-typename LinkedList<T>::iterator LinkedList<T>::end() const{
+typename LinkedList<T>::iterator LinkedList<T>::end() const {
     return LinkedList::iterator(new Node{.prev = lastN});
 }
 
@@ -173,13 +176,13 @@ typename LinkedList<T>::iterator LinkedList<T>::end() {
 }
 
 template<typename T>
-void LinkedList<T>::insert(T value, LinkedList::iterator it){
-    Node* insertedNode = new Node({.data = value, .next = it.curr, .prev = it.curr->prev});
-        it.curr->prev->next = insertedNode;
-        it.curr->prev = insertedNode;
-        if(lastN == insertedNode->prev){
-            lastN = insertedNode;
-        }
+void LinkedList<T>::insert(T value, LinkedList::iterator it) {
+    Node *insertedNode = new Node({.data = value, .next = it.curr, .prev = it.curr->prev});
+    it.curr->prev->next = insertedNode;
+    it.curr->prev = insertedNode;
+    if (lastN == insertedNode->prev) {
+        lastN = insertedNode;
+    }
 }
 
 template<typename T>
@@ -204,25 +207,36 @@ void LinkedList<T>::concat(LinkedList &tail) {
 }
 
 template<typename T>
-LinkedList<T>::LinkedList(std::initializer_list<T> initializerList) : LinkedList(){
-    for (auto& item: initializerList) {
+LinkedList<T>::LinkedList(std::initializer_list<T> initializerList) : LinkedList() {
+    for (auto &item: initializerList) {
         append(item);
     }
 }
 
 template<typename T>
-typename LinkedList<T>::iterator LinkedList<T>::find(T value){
-    for(auto it = begin(); it != end(); ++it){
-        if(*it == value) return it;
+typename LinkedList<T>::iterator LinkedList<T>::find(T value) {
+    for (auto it = begin(); it != end(); ++it) {
+        if (*it == value) return it;
     }
     return end();
 }
 
 template<typename T>
 void LinkedList<T>::printList() {
-    for (const auto& item : *this) {
+    for (const auto &item: *this) {
         std::cout << item << " -> ";
     }
+}
+
+template<typename T>
+T LinkedList<T>::operator[](int index) {
+    auto it = begin();
+
+    for (int i = 0; i < index; ++i) {
+        it++;
+    }
+
+    return *it;
 }
 
 #endif //UTILLIB_LINKEDLIST_H
