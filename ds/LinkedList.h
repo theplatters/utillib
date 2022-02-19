@@ -6,6 +6,7 @@
 #define UTILLIB_LINKEDLIST_H
 
 #include <optional>
+#include <ostream>
 
 template<typename T>
 class LinkedList {
@@ -58,9 +59,9 @@ class LinkedList {
             return *this;
         }
 
-        bool operator==(iterator b) const { return curr->prev == b.curr->prev; }
+        bool operator==(iterator com) const { return curr->prev == com.curr->prev; }
 
-        bool operator!=(iterator b) const { return curr->prev != b.curr->prev; }
+        bool operator!=(iterator com) const { return curr->prev != com.curr->prev; }
 
         T operator*() {
             return curr->data;
@@ -97,17 +98,14 @@ public:
 
     iterator find(T value);
 
-    T retrieve(Node *node);
-
     void printList();
-
-    void printCompleteList(); // only for debug purposes
 
     iterator begin();
     iterator begin() const;
 
     iterator end();
     iterator end() const;
+
 };
 
 
@@ -176,11 +174,11 @@ typename LinkedList<T>::iterator LinkedList<T>::end() {
 
 template<typename T>
 void LinkedList<T>::insert(T value, LinkedList::iterator it){
-    Node* n = new Node({.data = value, .next = it.curr, .prev = it.curr->prev});
-        it.curr->prev->next = n;
-        it.curr->prev = n;
-        if(lastN == n->prev){
-            lastN = n;
+    Node* insertedNode = new Node({.data = value, .next = it.curr, .prev = it.curr->prev});
+        it.curr->prev->next = insertedNode;
+        it.curr->prev = insertedNode;
+        if(lastN == insertedNode->prev){
+            lastN = insertedNode;
         }
 }
 
@@ -199,9 +197,9 @@ void LinkedList<T>::remove(LinkedList::iterator it) {
 
 template<typename T>
 void LinkedList<T>::concat(LinkedList &tail) {
-    auto e = end();
-    tail.firstN->next->prev = e.curr->prev;
-    e.curr->prev->next = tail.firstN->next;
+    auto endIt = end();
+    tail.firstN->next->prev = endIt.curr->prev;
+    endIt.curr->prev->next = tail.firstN->next;
     lastN = tail.lastN;
 }
 
