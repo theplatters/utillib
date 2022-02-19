@@ -95,7 +95,7 @@ public:
 
     void concat(LinkedList &tail);
 
-    iterator& find(T value);
+    iterator find(T value);
 
     T retrieve(Node *node);
 
@@ -104,8 +104,10 @@ public:
     void printCompleteList(); // only for debug purposes
 
     iterator begin();
+    iterator begin() const;
 
     iterator end();
+    iterator end() const;
 };
 
 
@@ -158,6 +160,16 @@ typename LinkedList<T>::iterator LinkedList<T>::begin() {
 }
 
 template<typename T>
+typename LinkedList<T>::iterator LinkedList<T>::begin() const {
+    return LinkedList::iterator(nullptr);
+}
+
+template<typename T>
+typename LinkedList<T>::iterator LinkedList<T>::end() const{
+    return LinkedList::iterator(new Node{.prev = lastN});
+}
+
+template<typename T>
 typename LinkedList<T>::iterator LinkedList<T>::end() {
     return LinkedList::iterator(new Node{.prev = lastN});
 }
@@ -197,6 +209,21 @@ template<typename T>
 LinkedList<T>::LinkedList(std::initializer_list<T> initializerList) : LinkedList(){
     for (auto& item: initializerList) {
         append(item);
+    }
+}
+
+template<typename T>
+typename LinkedList<T>::iterator LinkedList<T>::find(T value){
+    for(auto it = begin(); it != end(); ++it){
+        if(*it == value) return it;
+    }
+    return end();
+}
+
+template<typename T>
+void LinkedList<T>::printList() {
+    for (const auto& item : *this) {
+        std::cout << item << " -> ";
     }
 }
 

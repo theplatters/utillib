@@ -21,8 +21,8 @@ int main() {
 
     v.concat(v2);
 
-    for (const auto &item : v){
-        std::cout << item << " ";
-    }
+    v.remove(v.find(1));
+
+    v.printList();
     return 0;
 }
