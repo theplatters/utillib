@@ -88,7 +88,7 @@ public:
 
     void append(T value);
 
-    void remove(Node *node);
+    void remove(iterator it);
 
     void concat(LinkedList &tail);
 
@@ -172,6 +172,14 @@ void LinkedList<T>::insert(T value, LinkedList::iterator it){
 template<typename T>
 void LinkedList<T>::append(T value) {
     insert(value, end());
+}
+
+template<typename T>
+void LinkedList<T>::remove(LinkedList::iterator it) {
+    it.curr->prev->next = it.curr->next;
+    it.curr->next->prev = it.curr->prev;
+
+    delete it.curr;
 }
 
 
