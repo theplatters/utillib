@@ -11,9 +11,10 @@ int main() {
     tree[1].makeTree(tree[5],2,tree[5]);
     tree[2].makeTree(tree[5],3,tree[5]);
     tree[3].makeTree(tree[0],4,tree[1]);
-    //tree[4].makeTree(tree[2],5,tree[3]);
+    tree[4].makeTree(tree[2],5,tree[3]);
 
-   //BinaryTree<int> t1(tree[0],7,tree[2]);
+   BinaryTree<int> t1(tree[4],7,tree[3]);
+   t1.printBinaryTree();
 
     //    LinkedList<int> v;
 //
