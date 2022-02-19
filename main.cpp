@@ -15,14 +15,13 @@ int main() {
 
    //BinaryTree<int> t1(tree[0],7,tree[2]);
 
-    //    LinkedList<int> v;
-//
-//    v.append(5);
-//    v.append(4);
-//
-//
-//    for (const auto &item : v){
-//        std::cout << item << " ";
-//    }
+    LinkedList<int> v = {1,2,3,4};
+    LinkedList<int> v2 = {5,6,7,8};
+
+    v.concat(v2);
+
+    for (const auto &item : v){
+        std::cout << item << " ";
+    }
     return 0;
 }

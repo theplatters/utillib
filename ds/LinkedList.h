@@ -22,7 +22,7 @@ class LinkedList {
             long,                      // difference_type
             const Node *,               // pointer
             Node                       // reference
-    > {
+    >{
         Node *curr;
 
         explicit iterator(Node *curr) : curr(curr) {
@@ -35,7 +35,7 @@ class LinkedList {
 
 
         iterator &operator++(int) {
-            auto temp = *this;
+            auto& temp = *this;
             curr = curr->next;
             return temp;
         }
@@ -46,9 +46,16 @@ class LinkedList {
         }
 
         iterator &operator--(int) {
-            auto temp = *this;
+            auto& temp = *this;
             curr = curr->prev;
             return temp;
+        }
+
+        iterator &operator+(int amount){
+            for(int i = 0; i < amount; i++){
+                *this = ++(*this);
+            }
+            return *this;
         }
 
         bool operator==(iterator b) const { return curr->prev == b.curr->prev; }
@@ -65,14 +72,10 @@ class LinkedList {
     Node *lastN;
 
 
-    bool bol(Node *node);
-
-    bool eol(Node *node);
-
-    bool nodeInList(Node *node);
-
 public:
     LinkedList();
+
+    LinkedList(std::initializer_list<T> initializerList);
 
     ~LinkedList();
 
@@ -92,7 +95,7 @@ public:
 
     void concat(LinkedList &tail);
 
-    Node *find(T value);
+    iterator& find(T value);
 
     T retrieve(Node *node);
 
@@ -182,5 +185,19 @@ void LinkedList<T>::remove(LinkedList::iterator it) {
     delete it.curr;
 }
 
+template<typename T>
+void LinkedList<T>::concat(LinkedList &tail) {
+    auto e = end();
+    tail.firstN->next->prev = e.curr->prev;
+    e.curr->prev->next = tail.firstN->next;
+    lastN = tail.lastN;
+}
+
+template<typename T>
+LinkedList<T>::LinkedList(std::initializer_list<T> initializerList) : LinkedList(){
+    for (auto& item: initializerList) {
+        append(item);
+    }
+}
 
 #endif //UTILLIB_LINKEDLIST_H
