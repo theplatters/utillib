@@ -33,6 +33,7 @@ class LinkedList {
             return *this;
         }
 
+
         iterator &operator++(int) {
             auto temp = *this;
             curr = curr->next;
@@ -50,9 +51,9 @@ class LinkedList {
             return temp;
         }
 
-        bool operator==(iterator b) const { return curr == b.curr; }
+        bool operator==(iterator b) const { return curr->prev == b.curr->prev; }
 
-        bool operator!=(iterator b) const { return curr != b.curr; }
+        bool operator!=(iterator b) const { return curr->prev != b.curr->prev; }
 
         T operator*() {
             return curr->data;
@@ -71,8 +72,6 @@ class LinkedList {
     bool nodeInList(Node *node);
 
 public:
-
-
     LinkedList();
 
     ~LinkedList();
@@ -105,8 +104,6 @@ public:
 
     iterator end();
 };
-
-
 
 
 template<typename T>
@@ -152,36 +149,30 @@ T LinkedList<T>::last() {
 
 template<typename T>
 typename LinkedList<T>::iterator LinkedList<T>::begin() {
-    return LinkedList::iterator(firstN->next);
+    if(firstN->next)
+        return LinkedList::iterator(firstN->next);
+    return LinkedList::iterator(new Node{.prev = firstN});
 }
 
 template<typename T>
 typename LinkedList<T>::iterator LinkedList<T>::end() {
-    return LinkedList::iterator(lastN->next);
+    return LinkedList::iterator(new Node{.prev = lastN});
 }
 
 template<typename T>
-void LinkedList<T>::insert(T value, LinkedList::iterator it) {
-    if(!it.curr){
-        it.curr = new Node({.data = value, .next = nullptr, .prev = firstN});
-        firstN->next = it.curr;
-        return;
-    }
-
-    Node *n = new Node({.data = value, .next = it.curr->next, .prev = it.curr});
-    if(it.curr != lastN)
-        it.curr->next->prev = n;
-    else
-        lastN = n;
-    it.curr->next = n;
-
+void LinkedList<T>::insert(T value, LinkedList::iterator it){
+    Node* n = new Node({.data = value, .next = it.curr, .prev = it.curr->prev});
+        it.curr->prev->next = n;
+        it.curr->prev = n;
+        if(lastN == n->prev){
+            lastN = n;
+        }
 }
 
 template<typename T>
 void LinkedList<T>::append(T value) {
-    insert(value,end());
+    insert(value, end());
 }
-
 
 
 #endif //UTILLIB_LINKEDLIST_H
