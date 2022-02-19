@@ -18,6 +18,7 @@ private:
 
     Node* copyTree(Node* node);
     void emptyRec(Node* node);
+    void printBinaryTreeRec(Node* node);
 public:
     BinaryTree();
     BinaryTree(BinaryTree& left, T element, BinaryTree& right);
@@ -27,6 +28,8 @@ public:
     void makeTree(BinaryTree& left, T element, BinaryTree& right);
     BinaryTree leftTree();
     BinaryTree rightTree();
+    T key();
+    void printBinaryTree();
 
 };
 
@@ -95,6 +98,32 @@ template <typename T>
 BinaryTree<T> BinaryTree<T>::rightTree()
 {
     return BinaryTree({.root = this->root == nullptr?nullptr:copyTree(this->root->right)});
+}
+
+template <typename T>
+T BinaryTree<T>::key()
+{
+    if(isEmpty())
+    {
+        T dummy;
+        std::cout << "Tree is empty, cannot retrieve key" << std::endl;
+        return dummy;
+    }
+    return root->data;
+}
+
+template <typename T>
+void BinaryTree<T>::printBinaryTree(){std::cout <<"["; printBinaryTreeRec(root); std::cout <<"]" << std::endl;}
+
+template <typename T>
+void BinaryTree<T>::printBinaryTreeRec(Node* node)
+{
+    if(node!= nullptr)
+    {
+        printBinaryTreeRec(node->left);
+        std::cout << node->data << " ";
+        printBinaryTreeRec(node->right);
+    }
 }
 
 #endif
