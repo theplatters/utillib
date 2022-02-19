@@ -22,6 +22,8 @@ public:
     BinaryTree(BinaryTree& left, T element, BinaryTree& right);
     ~BinaryTree();
     void empty();
+    BinaryTree leftTree();
+    BinaryTree righTree();
 
 };
 
@@ -60,5 +62,13 @@ void BinaryTree<T>::emptyRec(Node* node)
     }
 }
 
+template <typename T>
+BinaryTree<T>::~BinaryTree(){empty();}
+
+template <typename T>
+BinaryTree<T> BinaryTree<T>::leftTree()
+{
+    return BinaryTree({.root = this->root == nullptr?nullptr:copyTree(this->root->left)});
+}
 
 #endif
