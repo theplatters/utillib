@@ -1,10 +1,12 @@
-#ifndef TREES_BINARYTREE_H
-#define TREES_BINARYTREE_H
+#include <iostream>
+
+#ifndef BINARYTREE_H
+#define BINARYTREE_H
 
 template <typename T>
 class BinaryTree
 {
-public:
+private:
     struct Node
     {
         T data;
@@ -12,7 +14,6 @@ public:
         Node* right;
     };
 
-private:
     Node* root;
 
     Node* copyTree(Node* node);
@@ -22,8 +23,10 @@ public:
     BinaryTree(BinaryTree& left, T element, BinaryTree& right);
     ~BinaryTree();
     void empty();
+    bool isEmpty();
+    void makeTree(BinaryTree& left, T element, BinaryTree& right);
     BinaryTree leftTree();
-    BinaryTree righTree();
+    BinaryTree rightTree();
 
 };
 
@@ -40,8 +43,20 @@ BinaryTree<T>::BinaryTree(BinaryTree& left, T element, BinaryTree& right)
 template <typename T>
 typename BinaryTree<T>::Node* BinaryTree<T>::copyTree(Node* node)
 {
+    if(node==nullptr)
+        return node;
+    return new Node({.data = node->data,.left = copyTree(node->left),.right = copyTree(node->right)});
+}
+
+template <typename T>
+void BinaryTree<T>::emptyRec(Node* node)
+{
     if(node!=nullptr)
-        return new Node({.data = node->data,.left = copyTree(node->left),.right = copyTree(node->right)});
+    {
+        emptyRec(node->left);
+        emptyRec(node->right);
+        delete node;
+    }
 }
 
 template<typename T>
@@ -52,23 +67,34 @@ void BinaryTree<T>::empty()
 }
 
 template <typename T>
-void BinaryTree<T>::emptyRec(Node* node)
+bool BinaryTree<T>::isEmpty(){return root==nullptr;}
+
+template<typename T>
+void BinaryTree<T>::makeTree(BinaryTree& left, T element, BinaryTree& right)
 {
-    if(node!=nullptr)
-    {
-        empytRec(node->left);
-        emptyRec(node->right);
-        delete node;
-    }
+    if(isEmpty())
+        root = new Node({.data = element,.left = copyTree(left.root), .right = copyTree(right.root)});
+    else
+        std::cout << "Tree non-empty, cannot make new tree" << std::endl;
 }
 
 template <typename T>
-BinaryTree<T>::~BinaryTree(){empty();}
+BinaryTree<T>::~BinaryTree()
+{
+    empty();
+    //root = nullptr;
+}
 
 template <typename T>
 BinaryTree<T> BinaryTree<T>::leftTree()
 {
     return BinaryTree({.root = this->root == nullptr?nullptr:copyTree(this->root->left)});
+}
+
+template <typename T>
+BinaryTree<T> BinaryTree<T>::rightTree()
+{
+    return BinaryTree({.root = this->root == nullptr?nullptr:copyTree(this->root->right)});
 }
 
 #endif
