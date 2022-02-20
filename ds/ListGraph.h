@@ -15,12 +15,13 @@ template<typename T>
 class ListGraph {
     std::vector<std::list<T *>> edges;
     std::vector<T *> vertices;
-    void depthFirstSearch(T& startVertex,std::vector<T*>& visited, std::vector<Edge<T>>& reachable);
+
+    void depthFirstSearch(T &startVertex, std::vector<T *> &visited, std::vector<Edge<T>> &reachable);
 
 public:
     bool adjacent(T &v1, T &v2);
 
-    std::list<T*> neighbours(T &v);
+    std::list<T *> neighbours(T &v);
 
     void addVertex(T &v);
 
@@ -32,7 +33,7 @@ public:
 
     std::vector<Edge<T>> depthFirstSearch(T &startVertex);
 
-    std::vector<Edge<T>> breathFirstSearch(T& startVertex);
+    std::vector<Edge<T>> breathFirstSearch(T &startVertex);
 
     void dumpGraph();
 };
@@ -49,7 +50,7 @@ bool ListGraph<T>::adjacent(T &v1, T &v2) {
 }
 
 template<typename T>
-std::list<T*> ListGraph<T>::neighbours(T &v) {
+std::list<T *> ListGraph<T>::neighbours(T &v) {
     int vIndex = std::find(vertices.begin(), vertices.end(), &v) - vertices.begin();
 
     std::list<T *> neighbours{};
@@ -71,10 +72,10 @@ template<typename T>
 void ListGraph<T>::removeVertex(T &v) {
     int vIndex = std::find(vertices.begin(), vertices.end(), &v) - vertices.begin();
     edges.erase(edges.begin() + vIndex);
-    vertices.erase(std::remove_if(vertices.begin(), vertices.end(), [&](auto i){return i == &v;}), vertices.end());
+    vertices.erase(std::remove_if(vertices.begin(), vertices.end(), [&](auto i) { return i == &v; }), vertices.end());
 
-    for (auto& item: edges) {
-        item.erase(std::remove_if(item.begin(), item.end(), [&](auto& i){return i == &v;}), item.end());
+    for (auto &item: edges) {
+        item.erase(std::remove_if(item.begin(), item.end(), [&](auto &i) { return i == &v; }), item.end());
     }
 }
 
@@ -106,31 +107,31 @@ void ListGraph<T>::removeEdge(Edge<T> e) {
 template<typename T>
 std::vector<Edge<T>> ListGraph<T>::depthFirstSearch(T &startVertex) {
 
-    std::vector<T*> visited;
+    std::vector<T *> visited;
     std::vector<Edge<T>> reachable;
 
-    depthFirstSearch(startVertex, visited,reachable);
+    depthFirstSearch(startVertex, visited, reachable);
 
     return reachable;
 }
 
 template<typename T>
-void ListGraph<T>::depthFirstSearch(T &startVertex, std::vector<T *>& visited, std::vector<Edge<T>>& reachable) {
+void ListGraph<T>::depthFirstSearch(T &startVertex, std::vector<T *> &visited, std::vector<Edge<T>> &reachable) {
     int vIndex = std::find(vertices.begin(), vertices.end(), &startVertex) - vertices.begin();
 
     visited.push_back(&startVertex);
 
-    for (auto& item : edges[vIndex]){
+    for (auto &item: edges[vIndex]) {
         reachable.emplace_back(startVertex, *item);
-        if(!std::any_of(visited.begin(), visited.end(), [&](auto& i){return i == item;}))
-            depthFirstSearch(*item,visited,reachable);
+        if (!std::any_of(visited.begin(), visited.end(), [&](auto &i) { return i == item; }))
+            depthFirstSearch(*item, visited, reachable);
     }
 }
 
 template<typename T>
 void ListGraph<T>::dumpGraph() {
     for (int i = 0; i < vertices.size(); ++i) {
-        for (const auto &item : edges[i]){
+        for (const auto &item: edges[i]) {
             std::cout << *vertices[i] << " <==> " << *item;
         }
         std::cout << "\n";
@@ -151,7 +152,7 @@ std::vector<Edge<T>> ListGraph<T>::breathFirstSearch(T &startVertex) {
         auto neighbourNode = neighbours(*curr);
         queue.pop();
         visited.push_back(curr);
-        for (auto& n: neighbourNode) {
+        for (auto &n: neighbourNode) {
             if (std::find(visited.begin(), visited.end(), n) == visited.end()) {
                 queue.push(n);
                 edgeVector.emplace_back(*curr, *n);
