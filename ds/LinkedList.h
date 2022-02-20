@@ -241,10 +241,6 @@ void LinkedList<T>::concat(LinkedList &tail) {
     tail.firstN = nullptr;
     tail.lastN = nullptr;
 
-//    for (const auto &item : tail){
-//        append(item);
-//    }
-
 }
 
 template<typename T>

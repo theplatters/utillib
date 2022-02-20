@@ -69,11 +69,9 @@ int main() {
     LinkedList<int> t = {1,2,3,4,5};
     LinkedList<int> t2 = {6,7,8,9,10};
 
-    t.insert(10,t.end()-1);
 
-    t.concat(t2);
-    t.remove(t.find(6));
 
+    t.printList();
 
     return 0;
 }
