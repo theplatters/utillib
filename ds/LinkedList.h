@@ -7,6 +7,7 @@
 
 #include <optional>
 #include <ostream>
+#include <memory>
 
 template<typename T>
 class LinkedList {
@@ -25,8 +26,13 @@ class LinkedList {
             Node                       // reference
     > {
         Node *curr;
+        const bool usable;
 
-        explicit iterator(Node *curr) : curr(curr) {
+        explicit iterator(Node *curr) : curr(curr), usable(true) {};
+
+        iterator(iterator &it) : curr(it.curr), usable(it.usable) {};
+
+        iterator(Node *curr, bool b) : curr(curr), usable(b) {
         }
 
         iterator &operator++() {
@@ -59,9 +65,18 @@ class LinkedList {
             return *this;
         }
 
+        iterator &operator-(int amount) {
+            for (int i = 0; i < amount; i++) {
+                *this = --(*this);
+            }
+            return *this;
+        }
+
         bool operator==(iterator com) const { return curr->prev == com.curr->prev; }
 
         bool operator!=(iterator com) const { return curr->prev != com.curr->prev; }
+
+        iterator operator=(iterator other) { return iterator(other); }
 
         T operator*() {
             return curr->data;
@@ -75,6 +90,8 @@ class LinkedList {
 
 public:
     LinkedList();
+
+    LinkedList(LinkedList &ll);
 
     LinkedList(std::initializer_list<T> initializerList);
 
@@ -127,14 +144,16 @@ LinkedList<T>::~LinkedList() {
 
 template<typename T>
 void LinkedList<T>::emptyList() {
-    auto it = begin();
-    while (it != end()) {
-        Node *curr = it.curr;
-        it++;
-        delete curr;
+    if (firstN) {
+        auto it = begin();
+        while (it != end()) {
+            Node *curr = it.curr;
+            it++;
+            delete curr;
+        }
+        firstN = nullptr;
+        lastN = nullptr;
     }
-    firstN = nullptr;
-    lastN = nullptr;
 }
 
 template<typename T>
@@ -157,12 +176,14 @@ template<typename T>
 typename LinkedList<T>::iterator LinkedList<T>::begin() {
     if (firstN->next)
         return LinkedList::iterator(firstN->next);
-    return LinkedList::iterator(new Node{.prev = firstN});
+    return LinkedList::iterator(new Node{.prev = firstN}, false);
 }
 
 template<typename T>
 typename LinkedList<T>::iterator LinkedList<T>::begin() const {
-    return LinkedList::iterator(nullptr);
+    if (firstN->next)
+        return LinkedList::iterator(firstN->next);
+    return LinkedList::iterator(new Node{.prev = firstN}, false);
 }
 
 template<typename T>
@@ -172,12 +193,13 @@ typename LinkedList<T>::iterator LinkedList<T>::end() const {
 
 template<typename T>
 typename LinkedList<T>::iterator LinkedList<T>::end() {
-    return LinkedList::iterator(new Node{.prev = lastN});
+    return LinkedList::iterator(new Node{.prev = lastN}, lastN != firstN);
 }
 
 template<typename T>
 void LinkedList<T>::insert(T value, LinkedList::iterator it) {
-    Node *insertedNode = new Node({.data = value, .next = it.curr, .prev = it.curr->prev});
+
+    Node *insertedNode = new Node({.data = value, .next =  it.usable ? it.curr : nullptr, .prev = it.curr->prev});
     it.curr->prev->next = insertedNode;
     it.curr->prev = insertedNode;
     if (lastN == insertedNode->prev) {
@@ -192,10 +214,20 @@ void LinkedList<T>::append(T value) {
 
 template<typename T>
 void LinkedList<T>::remove(LinkedList::iterator it) {
-    it.curr->prev->next = it.curr->next;
-    it.curr->next->prev = it.curr->prev;
+    if (it != end()) {
 
-    delete it.curr;
+        if (it.curr == lastN) {
+            lastN = lastN->prev;
+        }
+        it.curr->prev->next = it.curr->next;
+
+        if (it.curr->next) {
+            it.curr->next->prev = it.curr->prev;
+        }
+
+
+        delete it.curr;
+    }
 }
 
 template<typename T>
@@ -204,6 +236,15 @@ void LinkedList<T>::concat(LinkedList &tail) {
     tail.firstN->next->prev = endIt.curr->prev;
     endIt.curr->prev->next = tail.firstN->next;
     lastN = tail.lastN;
+
+    delete tail.firstN;
+    tail.firstN = nullptr;
+    tail.lastN = nullptr;
+
+//    for (const auto &item : tail){
+//        append(item);
+//    }
+
 }
 
 template<typename T>
@@ -226,6 +267,7 @@ void LinkedList<T>::printList() {
     for (const auto &item: *this) {
         std::cout << item << " -> ";
     }
+    std::cout << "\n";
 }
 
 template<typename T>
@@ -237,6 +279,13 @@ T LinkedList<T>::operator[](int index) {
     }
 
     return *it;
+}
+
+template<typename T>
+LinkedList<T>::LinkedList(LinkedList &ll) : LinkedList() {
+    for (const auto &item: ll) {
+        append(item);
+    }
 }
 
 #endif //UTILLIB_LINKEDLIST_H
