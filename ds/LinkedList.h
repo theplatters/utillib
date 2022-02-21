@@ -6,6 +6,8 @@
 #define UTILLIB_LINKEDLIST_H
 
 #include <optional>
+#include <ostream>
+#include <memory>
 
 template<typename T>
 class LinkedList {
@@ -24,8 +26,13 @@ class LinkedList {
             Node                       // reference
     > {
         Node *curr;
+        const bool usable;
 
-        explicit iterator(Node *curr) : curr(curr) {
+        explicit iterator(Node *curr) : curr(curr), usable(true) {};
+
+        iterator(iterator &it) : curr(it.curr), usable(it.usable) {};
+
+        iterator(Node *curr, bool b) : curr(curr), usable(b) {
         }
 
         iterator &operator++() {
@@ -33,8 +40,9 @@ class LinkedList {
             return *this;
         }
 
+
         iterator &operator++(int) {
-            auto temp = *this;
+            auto &temp = *this;
             curr = curr->next;
             return temp;
         }
@@ -45,14 +53,30 @@ class LinkedList {
         }
 
         iterator &operator--(int) {
-            auto temp = *this;
+            auto &temp = *this;
             curr = curr->prev;
             return temp;
         }
 
-        bool operator==(iterator b) const { return curr == b.curr; }
+        iterator &operator+(int amount) {
+            for (int i = 0; i < amount; i++) {
+                *this = ++(*this);
+            }
+            return *this;
+        }
 
-        bool operator!=(iterator b) const { return curr != b.curr; }
+        iterator &operator-(int amount) {
+            for (int i = 0; i < amount; i++) {
+                *this = --(*this);
+            }
+            return *this;
+        }
+
+        bool operator==(iterator com) const { return curr->prev == com.curr->prev; }
+
+        bool operator!=(iterator com) const { return curr->prev != com.curr->prev; }
+
+        iterator operator=(iterator other) { return iterator(other); }
 
         T operator*() {
             return curr->data;
@@ -64,16 +88,12 @@ class LinkedList {
     Node *lastN;
 
 
-    bool bol(Node *node);
-
-    bool eol(Node *node);
-
-    bool nodeInList(Node *node);
-
 public:
-
-
     LinkedList();
+
+    LinkedList(LinkedList &ll);
+
+    LinkedList(std::initializer_list<T> initializerList);
 
     ~LinkedList();
 
@@ -89,24 +109,24 @@ public:
 
     void append(T value);
 
-    void remove(Node *node);
+    void remove(iterator it);
 
     void concat(LinkedList &tail);
 
-    Node *find(T value);
-
-    T retrieve(Node *node);
+    iterator find(T value);
 
     void printList();
 
-    void printCompleteList(); // only for debug purposes
-
     iterator begin();
 
+    iterator begin() const;
+
     iterator end();
+
+    iterator end() const;
+
+    T operator[](int);
 };
-
-
 
 
 template<typename T>
@@ -124,14 +144,16 @@ LinkedList<T>::~LinkedList() {
 
 template<typename T>
 void LinkedList<T>::emptyList() {
-    auto it = begin();
-    while (it != end()) {
-        Node *curr = it.curr;
-        it++;
-        delete curr;
+    if (firstN) {
+        auto it = begin();
+        while (it != end()) {
+            Node *curr = it.curr;
+            it++;
+            delete curr;
+        }
+        firstN = nullptr;
+        lastN = nullptr;
     }
-    firstN = nullptr;
-    lastN = nullptr;
 }
 
 template<typename T>
@@ -152,36 +174,114 @@ T LinkedList<T>::last() {
 
 template<typename T>
 typename LinkedList<T>::iterator LinkedList<T>::begin() {
-    return LinkedList::iterator(firstN->next);
+    if (firstN->next)
+        return LinkedList::iterator(firstN->next);
+    return LinkedList::iterator(new Node{.prev = firstN}, false);
+}
+
+template<typename T>
+typename LinkedList<T>::iterator LinkedList<T>::begin() const {
+    if (firstN->next)
+        return LinkedList::iterator(firstN->next);
+    return LinkedList::iterator(new Node{.prev = firstN}, false);
+}
+
+template<typename T>
+typename LinkedList<T>::iterator LinkedList<T>::end() const {
+    return LinkedList::iterator(new Node{.prev = lastN});
 }
 
 template<typename T>
 typename LinkedList<T>::iterator LinkedList<T>::end() {
-    return LinkedList::iterator(lastN->next);
+    return LinkedList::iterator(new Node{.prev = lastN}, lastN != firstN);
 }
 
 template<typename T>
 void LinkedList<T>::insert(T value, LinkedList::iterator it) {
-    if(!it.curr){
-        it.curr = new Node({.data = value, .next = nullptr, .prev = firstN});
-        firstN->next = it.curr;
-        return;
+
+    Node *insertedNode = new Node({.data = value, .next =  it.usable ? it.curr : nullptr, .prev = it.curr->prev});
+    it.curr->prev->next = insertedNode;
+    it.curr->prev = insertedNode;
+    if (lastN == insertedNode->prev) {
+        lastN = insertedNode;
     }
-
-    Node *n = new Node({.data = value, .next = it.curr->next, .prev = it.curr});
-    if(it.curr != lastN)
-        it.curr->next->prev = n;
-    else
-        lastN = n;
-    it.curr->next = n;
-
 }
 
 template<typename T>
 void LinkedList<T>::append(T value) {
-    insert(value,end());
+    insert(value, end());
 }
 
+template<typename T>
+void LinkedList<T>::remove(LinkedList::iterator it) {
+    if (it != end()) {
 
+        if (it.curr == lastN) {
+            lastN = lastN->prev;
+        }
+        it.curr->prev->next = it.curr->next;
+
+        if (it.curr->next) {
+            it.curr->next->prev = it.curr->prev;
+        }
+
+
+        delete it.curr;
+    }
+}
+
+template<typename T>
+void LinkedList<T>::concat(LinkedList &tail) {
+    auto endIt = end();
+    tail.firstN->next->prev = endIt.curr->prev;
+    endIt.curr->prev->next = tail.firstN->next;
+    lastN = tail.lastN;
+
+    delete tail.firstN;
+    tail.firstN = nullptr;
+    tail.lastN = nullptr;
+
+}
+
+template<typename T>
+LinkedList<T>::LinkedList(std::initializer_list<T> initializerList) : LinkedList() {
+    for (auto &item: initializerList) {
+        append(item);
+    }
+}
+
+template<typename T>
+typename LinkedList<T>::iterator LinkedList<T>::find(T value) {
+    for (auto it = begin(); it != end(); ++it) {
+        if (*it == value) return it;
+    }
+    return end();
+}
+
+template<typename T>
+void LinkedList<T>::printList() {
+    for (const auto &item: *this) {
+        std::cout << item << " -> ";
+    }
+    std::cout << "\n";
+}
+
+template<typename T>
+T LinkedList<T>::operator[](int index) {
+    auto it = begin();
+
+    for (int i = 0; i < index; ++i) {
+        it++;
+    }
+
+    return *it;
+}
+
+template<typename T>
+LinkedList<T>::LinkedList(LinkedList &ll) : LinkedList() {
+    for (const auto &item: ll) {
+        append(item);
+    }
+}
 
 #endif //UTILLIB_LINKEDLIST_H
